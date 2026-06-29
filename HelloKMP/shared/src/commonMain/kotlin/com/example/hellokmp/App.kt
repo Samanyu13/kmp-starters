@@ -41,11 +41,13 @@ import hellokmp.shared.generated.resources.compose_text
 import hellokmp.shared.generated.resources.logo
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun App(batteryManager: BatteryManager) {
+fun App() {
+    val batteryManager = koinInject<BatteryManager>()
     MaterialTheme {
         val navController = rememberNavController()
         Scaffold(
