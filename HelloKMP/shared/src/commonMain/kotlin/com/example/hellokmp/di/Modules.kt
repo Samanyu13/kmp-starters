@@ -2,6 +2,8 @@ package com.example.hellokmp.di
 
 import com.example.hellokmp.dependencies.Repo
 import com.example.hellokmp.dependencies.RepoImpl
+import com.example.hellokmp.network.InsultCensorClient
+import com.example.hellokmp.network.createHttpClient
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -17,4 +19,6 @@ val sharedModule = module {
      */
 
     singleOf(::RepoImpl).bind<Repo>()
+    single { createHttpClient(get()) }
+    singleOf(::InsultCensorClient)
 }

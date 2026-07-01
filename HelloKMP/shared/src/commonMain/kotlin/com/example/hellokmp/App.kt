@@ -58,7 +58,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun App(client: InsultCensorClient) {
+fun App() {
     val batteryManager = koinInject<BatteryManager>()
     MaterialTheme {
         val navController = rememberNavController()
@@ -127,7 +127,7 @@ fun App(client: InsultCensorClient) {
                 }
 
                 composable(route = "censor") {
-                    Censor(client)
+                    Censor()
                 }
             }
         }
@@ -135,7 +135,8 @@ fun App(client: InsultCensorClient) {
 }
 
 @Composable
-fun Censor(client: InsultCensorClient) {
+fun Censor() {
+    val client = koinInject<InsultCensorClient>()
     var censoredText by remember { mutableStateOf<String?>(null) }
     var uncensoredText by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
