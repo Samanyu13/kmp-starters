@@ -30,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,13 +43,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.hellokmp.dependencies.TestViewModel
 import com.example.hellokmp.network.InsultCensorClient
+import com.example.hellokmp.presentation.CensorViewModel
 import com.example.hellokmp.util.NetworkError
 import com.example.hellokmp.util.onError
 import com.example.hellokmp.util.onSuccess
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import hellokmp.shared.generated.resources.Res
 import hellokmp.shared.generated.resources.compose_text
 import hellokmp.shared.generated.resources.logo
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -136,13 +136,9 @@ fun App() {
 
 @Composable
 fun Censor() {
-    val client = koinInject<InsultCensorClient>()
-    var censoredText by remember { mutableStateOf<String?>(null) }
-    var uncensoredText by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<NetworkError?>(null) }
+    val viewModel = koinViewModel<CensorViewModel>()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    val coroutineScope = rememberCoroutineScope()
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -150,27 +146,14 @@ fun Censor() {
     ) {
         TextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            value = uncensoredText,
-            onValueChange = { uncensoredText = it },
+            value = state.uncensoredText,
+            onValueChange = { viewModel.onUncensoredTextChange(it) },
             placeholder = { Text("Uncensored Text") }
         )
         Button(onClick = {
-            coroutineScope.launch {
-                isLoading = true
-                errorMessage = null
-
-                client.censorWords(uncensoredText)
-                    .onSuccess {
-                        censoredText = it
-                    }
-                    .onError {
-                        errorMessage = it
-                    }
-
-                isLoading = false
-            }
+            viewModel.censorText()
         }) {
-            if (isLoading) {
+            if (state.isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(15.dp),
                     strokeWidth = 1.dp,
@@ -180,10 +163,10 @@ fun Censor() {
                 Text("Censor!")
             }
         }
-        censoredText?.let {
+        state.censoredText?.let {
             Text(it)
         }
-        errorMessage?.let {
+        state.errorMessage?.let {
             Text(it.name, color = Color.Red)
         }
     }

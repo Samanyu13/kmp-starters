@@ -4,8 +4,10 @@ import com.example.hellokmp.dependencies.Repo
 import com.example.hellokmp.dependencies.RepoImpl
 import com.example.hellokmp.network.InsultCensorClient
 import com.example.hellokmp.network.createHttpClient
+import com.example.hellokmp.presentation.CensorViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
@@ -21,4 +23,5 @@ val sharedModule = module {
     singleOf(::RepoImpl).bind<Repo>()
     single { createHttpClient(get()) }
     singleOf(::InsultCensorClient)
+    viewModelOf(::CensorViewModel)
 }
