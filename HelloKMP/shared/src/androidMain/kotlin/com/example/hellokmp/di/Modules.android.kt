@@ -2,9 +2,11 @@ package com.example.hellokmp.di
 
 import com.example.hellokmp.BatteryManager
 import com.example.hellokmp.BatteryManagerImpl
+import com.example.hellokmp.data.createDataStore
 import com.example.hellokmp.dependencies.DbClient
 import com.example.hellokmp.dependencies.TestViewModel
 import io.ktor.client.engine.okhttp.OkHttp
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
@@ -15,4 +17,5 @@ actual val platformModule = module {
     viewModelOf(::TestViewModel)
     singleOf(::BatteryManagerImpl).bind<BatteryManager>()
     single { OkHttp.create() }
+    single { createDataStore(androidContext()) }
 }

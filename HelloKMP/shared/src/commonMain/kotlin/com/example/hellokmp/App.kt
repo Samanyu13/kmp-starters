@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BatteryFull
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -42,12 +44,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.hellokmp.dependencies.TestViewModel
-import com.example.hellokmp.network.InsultCensorClient
 import com.example.hellokmp.presentation.CensorViewModel
-import com.example.hellokmp.util.NetworkError
-import com.example.hellokmp.util.onError
-import com.example.hellokmp.util.onSuccess
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.hellokmp.presentation.DataStoreViewModel
 import hellokmp.shared.generated.resources.Res
 import hellokmp.shared.generated.resources.compose_text
 import hellokmp.shared.generated.resources.logo
@@ -110,6 +108,20 @@ fun App() {
                             }
                         }
                     )
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.Save, contentDescription = null) },
+                        label = { Text("DataStore") },
+                        selected = currentDestination?.hierarchy?.any { it.route == "datastore" } == true,
+                        onClick = {
+                            navController.navigate("datastore") {
+                                popUpTo(navController.graph.findStartDestination().displayName) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    )
                 }
             }
         ) { innerPadding ->
@@ -129,7 +141,28 @@ fun App() {
                 composable(route = "censor") {
                     Censor()
                 }
+
+                composable(route = "datastore") {
+                    DataStoreScreen()
+                }
             }
+        }
+    }
+}
+
+@Composable
+fun DataStoreScreen() {
+    val viewModel = koinViewModel<DataStoreViewModel>()
+    val counter by viewModel.counter.collectAsStateWithLifecycle()
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(text = "Counter: $counter")
+        Button(onClick = { viewModel.increment() }) {
+            Text("Increment and save")
         }
     }
 }

@@ -2,6 +2,7 @@ package com.example.hellokmp.di
 
 import com.example.hellokmp.BatteryManager
 import com.example.hellokmp.BatteryManagerImpl
+import com.example.hellokmp.data.createDataStore
 import com.example.hellokmp.dependencies.DbClient
 import com.example.hellokmp.dependencies.TestViewModel
 import io.ktor.client.engine.darwin.Darwin
@@ -15,4 +16,5 @@ actual val platformModule = module {
     viewModelOf(::TestViewModel)
     singleOf(::BatteryManagerImpl).bind<BatteryManager>()
     single { Darwin.create() }
+    single { createDataStore() }
 }
